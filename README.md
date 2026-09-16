@@ -25,6 +25,22 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Fonts
+
+This project loads `Plus Jakarta Sans` at runtime in `src/app/_layout.tsx` with `useFonts` from `expo-font`.
+
+- Font files live in `assets/fonts`
+- The root layout keeps the splash screen visible with `expo-splash-screen` until the fonts are loaded
+- The loaded family names are `sans-light`, `sans-regular`, `sans-medium`, `sans-semibold`, `sans-bold`, and `sans-extrabold`
+
+Example usage:
+
+```tsx
+<Text style={{ fontFamily: "sans-semibold" }}>Hello</Text>
+```
+
+This is a valid Expo SDK 57 approach, especially when you want one runtime loading path that also works on web. For native-only Android/iOS apps, Expo recommends the `expo-font` config plugin as the more efficient option.
+
 ## Get a fresh project
 
 When you're ready, run:
