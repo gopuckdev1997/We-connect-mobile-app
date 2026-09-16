@@ -13,6 +13,22 @@ module.exports = {
         "sans-bold": ["sans-bold"],
         "sans-extrabold": ["sans-extrabold"],
       },
+      colors: {
+        brand: {
+          50: "#F2F7F4",
+          100: "#E1EFE7",
+          200: "#B8D9C5",
+          500: "#2D5A43",
+          600: "#244936",
+          700: "#1B3729",
+          dark: "#1C382A",
+        },
+        surface: {
+          background: "#FAFAF5",
+          card: "#FFFFFF",
+          border: "#F0F0EE",
+        },
+      },
     },
   },
   plugins: [],
