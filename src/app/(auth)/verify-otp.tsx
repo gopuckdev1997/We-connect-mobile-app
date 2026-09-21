@@ -14,9 +14,9 @@ import { PrimaryButton } from "@/common/PrimaryButton";
 import { OtpInput } from "@/common/OtpInput";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-export default function OtpVerifyScreen({}) {
+export default function OtpVerifyScreen() {
   const router = useRouter();
-  const { phone, role } = useLocalSearchParams<{
+  const { role } = useLocalSearchParams<{
     phone: string;
     role: string;
   }>();
@@ -42,7 +42,7 @@ export default function OtpVerifyScreen({}) {
       if (role === "WORKER") {
         router.push("/(onboarding)/worker");
       } else {
-        router.push("/(tabs)/discover");
+        // router.push("/(tabs)/discover");
       }
     }, 1000);
   };
@@ -72,7 +72,7 @@ export default function OtpVerifyScreen({}) {
                 <OtpInput value={otp} onChange={setOtp} length={4} />
                 <View className="mb-auto flex-row items-center">
                   <Text className=" font-sans text-[15px] text-slate-600 ">
-                    Didn&#39;t receive code?
+                    Did&#39;t receive code?
                   </Text>
                   <TouchableOpacity
                     activeOpacity={0.7}
