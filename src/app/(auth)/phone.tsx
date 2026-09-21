@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -23,11 +23,6 @@ export default function PhoneScreen() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    setPhoneNumber(1234567890);
-    setAgreed(true);
-  }, []);
 
   const isSubmitEnabled = phoneNumber.length >= 10 && agreed;
 

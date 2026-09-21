@@ -5,7 +5,7 @@ interface InputFieldProps extends TextInputProps {
   label: string;
   value: string;
   placeholder?: string;
-  onChange: (value: string) => void;
+  onChangeText: (value: string) => void;
   multiline?: boolean;
   containerClassName?: string;
 }
@@ -14,9 +14,10 @@ export const InputField = ({
   label,
   containerClassName = "",
   multiline,
+  onChangeText,
   ...props
 }: InputFieldProps) => {
-  const [isFocused, setFocused] = useState(true);
+  const [isFocused, setIsFocused] = useState(true);
 
   return (
     <View className={`mb-5 ${containerClassName}`}>
@@ -24,13 +25,14 @@ export const InputField = ({
         {label}
       </Text>
       <View
-        className={`rounded-2xl  border bg-white transition-all ${isFocused ? "border-brand-500" : "border-slate-200"} ${multiline ? "min-h-[100px] py-3" : "h-14 justify-center"} `}
+        className={`rounded-2xl  border bg-white  ${isFocused ? "border-brand-500" : "border-slate-200"} ${multiline ? "min-h-[100px] py-3" : "h-14 justify-center"} `}
       >
         <TextInput
           className={`px-4 font-sans-medium text-[16px] text-slate-900 ${
             multiline ? "flex-1" : ""
           }`}
           placeholderTextColor="#94A3B8"
+          onChangeText={onChangeText}
           onFocus={(e) => {
             setIsFocused(true);
             props.onFocus?.(e);

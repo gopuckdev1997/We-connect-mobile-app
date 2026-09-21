@@ -4,8 +4,8 @@ import { TouchableOpacity, ActivityIndicator, Text } from "react-native";
 interface PrimaryButtonProps {
   title: string;
   onPress: () => void;
-  disabled: boolean;
-  isLoading: boolean;
+  disabled?: boolean;
+  isLoading?: boolean;
   className?: string;
 }
 
