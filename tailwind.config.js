@@ -28,6 +28,10 @@ module.exports = {
           card: "#FFFFFF",
           border: "#F0F0EE",
         },
+        lite: {
+          100: "#FEF3C7",
+          200: "#D97706",
+        },
       },
     },
   },

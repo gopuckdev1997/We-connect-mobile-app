@@ -5,7 +5,7 @@ import { InputField } from "@/common/InputField";
 import { PrimaryButton } from "@/common/PrimaryButton";
 import { useRouter } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { Droplet, Zap, Wrench, MapPin } from "lucide-react-native";
+import { Droplet, Zap, Wrench } from "lucide-react-native";
 import { useState } from "react";
 import { useWorkerStore } from "@/store/useWorkerStore";
 
@@ -52,13 +52,12 @@ export default function SetupSerive() {
       hourlyRate,
     };
 
-    console.log("SENDING TO NESTJS BACKEND:", finalWorkerPayload);
-
     // Simulate Network Request to /api/workers
     setTimeout(() => {
       setIsSubmitting(false);
       // Profile complete! Send them to the Discovery Dashboard
-      // router.push("/(tabs)/discover");
+      router.push("/(tabs)/discover");
+      resetProfileState();
     }, 1500);
   };
 
