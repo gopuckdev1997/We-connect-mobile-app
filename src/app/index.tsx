@@ -21,7 +21,11 @@ export default function WelcomeScreen() {
     }
   };
 
-  const handleGuestBrows = async () => {};
+  const handleGuestBrows = async () => {
+    router.push({
+      pathname: "/(tabs)/discover",
+    });
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-surface-background">
@@ -122,7 +126,10 @@ export default function WelcomeScreen() {
           >
             <Text className="font-sans text-sm text-slate-600">
               Looking to browse first?{" "}
-              <Text className="font-sans-bold text-brand-500">
+              <Text
+                className="font-sans-bold text-brand-500"
+                onPress={() => handleGuestBrows()}
+              >
                 Enter as Guest
               </Text>
             </Text>
