@@ -8,6 +8,7 @@ interface InputFieldProps extends TextInputProps {
   onChangeText: (value: string) => void;
   multiline?: boolean;
   containerClassName?: string;
+  disabled?: boolean;
 }
 
 export const InputField = ({
@@ -15,9 +16,10 @@ export const InputField = ({
   containerClassName = "",
   multiline,
   onChangeText,
+  disabled,
   ...props
 }: InputFieldProps) => {
-  const [isFocused, setIsFocused] = useState(true);
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <View className={`mb-5 ${containerClassName}`}>
@@ -25,14 +27,15 @@ export const InputField = ({
         {label}
       </Text>
       <View
-        className={`rounded-2xl  border bg-white  ${isFocused ? "border-brand-500" : "border-slate-200"} ${multiline ? "min-h-[100px] py-3" : "h-14 justify-center"} `}
+        className={`rounded-2xl  border  ${disabled ? "border-slate-200 bg-slate-100" : `bg-white ${isFocused ? "border-brand-500" : "border-slate-200"}`} ${multiline ? "min-h-[100px] py-3" : "h-14 justify-center"} `}
       >
         <TextInput
-          className={`px-4 font-sans-medium text-[16px] text-slate-900 ${
-            multiline ? "flex-1" : ""
-          }`}
+          className={`px-4 font-sans-medium text-[16px] ${
+            disabled ? "text-slate-500" : "text-slate-900"
+          } ${multiline ? "flex-1" : ""}`}
           placeholderTextColor="#94A3B8"
           onChangeText={onChangeText}
+          editable={!disabled}
           onFocus={(e) => {
             setIsFocused(true);
             props.onFocus?.(e);

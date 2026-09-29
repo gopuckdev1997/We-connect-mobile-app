@@ -8,8 +8,7 @@
     "scheme": "weconnectmobileapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
-    },
+      "icon": "./assets/expo.icon"},
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -20,7 +19,9 @@
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "resize",
       "edgeToEdgeEnabled": true,
-      "package": "com.weconnect.app"
+      "package": "com.weconnect.app",
+      "googleServicesFile": "./google-services.json",
+      "usesCleartextTraffic": true
     },
     "web": {
       "output": "static",
@@ -35,7 +36,22 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "expo-secure-store",
+      "@react-native-firebase/app",
+      "@react-native-firebase/auth",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "We-Connect accesses your photos so you can set a profile picture.",
+          "cameraPermission": "We-Connect accesses your camera so you can take a profile picture."
+        }
+      ],
+      ["expo-build-properties",{
+        "android": {
+          "newArchEnabled": true
+        }
+      }]
     ],
     "experiments": {
       "typedRoutes": true,

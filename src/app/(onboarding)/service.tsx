@@ -1,65 +1,140 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "@/common/screenHeader";
 import { InputField } from "@/common/InputField";
+import { SliderField } from "@/common/SliderField";
 import { PrimaryButton } from "@/common/PrimaryButton";
 import { useRouter } from "expo-router";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { Droplet, Zap, Wrench } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWorkerStore } from "@/store/useWorkerStore";
+import { useFireBaseStore } from "@/store/useFireBaseStore";
+import { api } from "@/app/service/api-base";
+import {
+  Wrench,
+  Zap,
+  Hammer,
+  Paintbrush,
+  Sparkles,
+  Car,
+  HelpCircle
+} from 'lucide-react-native';
 
-// Mocking the Category table from your database
-const MOCK_CATEGORIES = [
-  { id: 1, name: "Plumbing", icon: Droplet, color: "#0284C7", bg: "#F0F9FF" },
-  { id: 2, name: "Electrical", icon: Zap, color: "#D97706", bg: "#FEF3C7" },
-  { id: 3, name: "Handyman", icon: Wrench, color: "#475569", bg: "#F1F5F9" },
-];
+const ICON_MAP: Record<string, React.ComponentType<any>> = {
+  "pipe-wrench": Wrench, // Maps to Plumber
+  flash: Zap, // Maps to Electrician
+  hammer: Hammer, // Maps to Carpenter
+  "format-paint": Paintbrush, // Maps to Painter
+  broom: Sparkles, // Maps to Cleaning & Housekeeping
+  drizzle: Car, // Maps to Driver
+};
+
+
 
 export default function SetupSerive() {
   const router = useRouter();
-  const { resetProfileState, fullName, experienceInYear, bio, hourlyRate } =
-    useWorkerStore();
+  const {
+    resetProfileState,
+    fullName,
+    age,
+    gender,
+    experienceInYear,
+    bio,
+    hourlyRate,
+    address,
+    profileImage,
+  } = useWorkerStore();
   // State mapping to Category and Address/preferredLocationRange models
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
     null
   );
-  const [pincode, setPincode] = useState("");
-  const [travelRadius, setTravelRadius] = useState("5");
+  // Pre-fill from the location picked on the previous screen, but keep it
+  // editable in case the auto-detected pincode isn't quite right.
+  const [pincode, setPincode] = useState(address?.locality?.pinCode ?? "");
+  const [travelRadius, setTravelRadius] = useState(5);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [workerCategory, setWorkerCategory] = useState<[] | null>()
+
   const isFormValid =
-    selectedCategoryId !== null && pincode.length === 6 && travelRadius !== "";
+    selectedCategoryId !== null && pincode.length === 6 && travelRadius > 0;
+  
+  
+  const listWorkersCategories = async () => {
+    const response = await api.get(`/workers/categories`);
 
-  console.log({ fullName });
+    let { category } = response;
+    return category;
 
-  const handleCompleteProfile = () => {
+
+
+  };
+
+
+  useEffect(() => {
+    listWorkersCategories().then((response)=>{
+      console.log(response);
+    setWorkerCategory(response?.length > 0 ? response : []);
+    }).catch((err)=>{
+      console.log(err);
+    }).finally(()=>{
+
+    })
+
+
+  },[])
+
+
+  const handleCompleteProfile = async () => {
     if (!isFormValid) return;
     setIsSubmitting(true);
 
-    // In a real app, you would combine the data from `worker.tsx` with this data
-    // using a global state manager (like Zustand) and send it to NestJS here.
+    // Payload shaped to match backend WorkerOnBoardDto exactly.
+    // NOTE: idProofType / idProofDocumentUrl are required by the DTO but
+    // there is no capture UI for them yet anywhere in the app — the
+    // request will fail backend validation until that's added.
     const finalWorkerPayload = {
-      // ...data from previous screen (fullName, hourlyRate, etc.)
-      categoryId: selectedCategoryId,
-      location: {
-        pincode: pincode,
-        preferredLocationRange: parseInt(travelRadius, 10),
-      },
       fullName,
+      age,
+      gender,
+      profileImage,
       experienceInYear,
-      bio,
+      pricingType: "HOURLY",
+      salaryType: "HOURLY",
       hourlyRate,
+      // `minimumCharge` has no DB default and is NOT NULL — falling back to
+      // hourlyRate until a dedicated input is added.
+      minimumCharge: hourlyRate,
+      isNegotiable: false,
+      categoryIds: selectedCategoryId !== null ? [selectedCategoryId] : [],
+      address: address?.address,
+      locality: address?.locality,
     };
+    console.log({ finalWorkerPayload });
 
-    // Simulate Network Request to /api/workers
-    setTimeout(() => {
-      setIsSubmitting(false);
-      // Profile complete! Send them to the Discovery Dashboard
-      router.push("/(tabs)/discover");
+    try {
+      const response: any = await api.post("/auth/onboard/worker", finalWorkerPayload);
+      console.log({ response });
+      // Worker is fully onboarded now — persist their worker id so the
+      // dashboard can fetch `/workers/:id` on future app opens too.
+      await useFireBaseStore
+        .getState()
+        .saveSession(
+          response.accessToken,
+          response.user,
+          false,
+          "WORKER",
+          response.worker?.id
+        );
+      router.replace("/(worker)/(tabs)/discover");
       resetProfileState();
-    }, 1500);
+    } catch (err) {
+      console.log({ err });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   return (
     <SafeAreaView className="flex-1 bg-surface-background" edges={["top"]}>
@@ -75,10 +150,15 @@ export default function SetupSerive() {
           <Text className="mb-3 ml-2 font-sans-bold text-[15px] text-slate-700">
             Primary Specialty
           </Text>
-          <View className="mb-4 ml-2 flex-row flex-wrap gap-2">
-            {MOCK_CATEGORIES.map((category) => {
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mb-4"
+            contentContainerStyle={{ gap: 8, paddingHorizontal: 8 }}
+          >
+            {workerCategory?.map((category) => {
               const isSelected = selectedCategoryId === category.id;
-              const IconComponent = category.icon;
+              const TargetIcon = ICON_MAP[category.icon] || HelpCircle;
 
               return (
                 <TouchableOpacity
@@ -93,9 +173,12 @@ export default function SetupSerive() {
                 >
                   <View
                     className="mr-3 h-8 w-8 items-center justify-center rounded-full"
-                    style={{ backgroundColor: category.bg }}
+                    style={{ backgroundColor: `${category.color}20` }} // Appends '20' for a 12% translucent light bg accent
                   >
-                    <IconComponent size={16} color={category.color} />
+                    <TargetIcon
+                      size={16}
+                      color={isSelected ? "#2D5A43" : category.color}
+                    />
                   </View>
                   <Text
                     className={`font-sans-bold text-[15px] ${
@@ -107,7 +190,7 @@ export default function SetupSerive() {
                 </TouchableOpacity>
               );
             })}
-          </View>
+          </ScrollView>
           {/* Location Details Area */}
           <View className="mb-4 ">
             <Text className="mb-3 ml-2 flex-row items-center font-sans-bold text-[15px] text-slate-700">
@@ -119,17 +202,19 @@ export default function SetupSerive() {
                 placeholder="Enter 6-digit pincode"
                 value={pincode}
                 onChangeText={setPincode}
+                disabled={true}
                 keyboardType="number-pad"
                 maxLength={6}
               />
 
-              <InputField
-                label="Travel Radius (in kilometers)"
-                placeholder="e.g. 10"
+              <SliderField
+                label="Travel Radius"
                 value={travelRadius}
-                onChangeText={setTravelRadius}
-                keyboardType="number-pad"
-                maxLength={3}
+                onValueChange={setTravelRadius}
+                min={1}
+                max={50}
+                step={1}
+                formatValue={(v) => `${v} km`}
               />
             </View>
           </View>

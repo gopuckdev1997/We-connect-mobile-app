@@ -5,6 +5,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -35,19 +36,21 @@ export default function RootLayout() {
   return (
     <KeyboardProvider>
       <SafeAreaProvider>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: "#ffffff" },
-          }}
-        >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="modal/filter"
-            options={{ headerShown: false, presentation: "modal" }}
-          />
-        </Stack>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: "#ffffff" },
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="modal/filter"
+              options={{ headerShown: false, presentation: "modal" }}
+            />
+          </Stack>
+        </GestureHandlerRootView>
       </SafeAreaProvider>
     </KeyboardProvider>
   );

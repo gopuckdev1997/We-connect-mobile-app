@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -15,29 +16,58 @@ import { Check, Phone } from "lucide-react-native";
 import { Labels } from "@/app/constants/labels";
 import { ScreenHeader } from "@/common/screenHeader";
 import { PrimaryButton } from "@/common/PrimaryButton";
+import {
+  getAuth,
+  signInWithPhoneNumber,
+  type ConfirmationResult,
+} from "@react-native-firebase/auth";
+import { useFireBaseStore } from "@/store/useFireBaseStore";
 
 export default function PhoneScreen() {
   const router = useRouter();
   const { role } = useLocalSearchParams<{ role?: string }>();
 
+  const auth = getAuth();
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const fireBaseStore = useFireBaseStore()
+
+
+  const [confirmSession, setConfirmSession] = useState(false);
+
   const isSubmitEnabled = phoneNumber.length >= 10 && agreed;
 
-  const handleSendCode = () => {
+  const handleSendCode = async() => {
     if (!isSubmitEnabled) return;
+    const sanitizedNumber = phoneNumber.trim().replace(/\D/g, "");
+    const formattedPhone = sanitizedNumber.startsWith("91")
+      ? `+${sanitizedNumber}`
+      : `+91${sanitizedNumber}`;
     setIsSubmitting(true);
+    try {
+      // send phone number to firebase sdk
 
-    // Simulate network delay, then navigate
-    setTimeout(() => {
-      setIsSubmitting(false);
+      // USE NATIVE SDK: This utilizes the native Android layer directly
+      const confirmation = await signInWithPhoneNumber(auth, formattedPhone);
+
+      Alert.alert(`OTP sent to phone ${formattedPhone}`);
+
+      fireBaseStore.setPhoneNumber(formattedPhone);
+      fireBaseStore.setConfirmSession(confirmation);
+
       router.push({
         pathname: "/(auth)/verify-otp",
-        params: { phone: phoneNumber, role },
+        params: { role },
       });
-    }, 500);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+
   };
 
   return (

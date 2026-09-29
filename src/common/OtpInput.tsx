@@ -40,7 +40,7 @@ export const OtpInput = ({ length = 4, value, onChange }: OtpInputProps) => {
             return (
               <View
                 key={index}
-                className={`h-[70px] w-[70px] items-center justify-center rounded-2xl border-2 bg-white
+                className={`w-[45px] items-center justify-center rounded-2xl border-2 bg-white
                 ${
                   isCurrentFocus
                     ? "border-brand-500"
@@ -63,7 +63,6 @@ export const OtpInput = ({ length = 4, value, onChange }: OtpInputProps) => {
         value={value}
         onChangeText={(text) => {
           const cleanText = text.replace(/[^0-9]/g, "");
-          console.log(cleanText);
           if (cleanText.length <= length) {
             onChange(cleanText);
           }
@@ -71,11 +70,9 @@ export const OtpInput = ({ length = 4, value, onChange }: OtpInputProps) => {
         keyboardType="number-pad"
         maxLength={length}
         onFocus={() => {
-          console.log("OTP FOCUS");
           setFocused(true);
         }}
         onBlur={() => {
-          console.log("OTP BLUR");
           setFocused(false);
         }}
         // autoFocus={true}

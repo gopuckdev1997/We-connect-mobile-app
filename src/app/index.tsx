@@ -23,7 +23,7 @@ export default function WelcomeScreen() {
 
   const handleGuestBrows = async () => {
     router.push({
-      pathname: "/(tabs)/discover",
+      pathname: "/(worker)/(tabs)/discover",
     });
   };
 
